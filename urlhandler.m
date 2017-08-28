@@ -29,13 +29,15 @@ int main(int argc, const char *argv[]) {
 		}
 	} else {
 		NSString *handler = [NSString stringWithUTF8String: argv[2]];
-
-		if ([handlers indexOfObjectPassingTest: ^ (id obj, NSUInteger idx, BOOL *stop) {
-			return (BOOL)([handler caseInsensitiveCompare: obj] == NSOrderedSame);
-		}] == NSNotFound) {
-			fprintf(stderr, "Not a valid scheme %s handler: %s\n", [scheme UTF8String], [handler UTF8String]);
-			return 2;
-		}
+		if ([handler length]) {
+			if (!handlers || [handlers indexOfObjectPassingTest: ^ (id obj, NSUInteger idx, BOOL *stop) {
+				return (BOOL)([handler caseInsensitiveCompare: obj] == NSOrderedSame);
+			}] == NSNotFound) {
+				fprintf(stderr, "Not a valid scheme %s handler: %s\n", [scheme UTF8String], [handler UTF8String]);
+				return 2;
+			}
+		} else
+			handler = nil;
 
 		OSStatus status = LSSetDefaultHandlerForURLScheme(
 			(__bridge CFStringRef)scheme,
